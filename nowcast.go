@@ -7,6 +7,14 @@ type PositionConfig struct {
 	Y            int
 	CursorHeight int
 	MapID        int
+	Trim         TrimConfig
+}
+type TrimConfig struct {
+	Trim   bool
+	X      int
+	Y      int
+	Width  int
+	Height int
 }
 
 type NowcastComposer struct {
@@ -30,7 +38,7 @@ func NewComposer(pos PositionConfig) (NowcastComposer, error) {
 	if err != nil {
 		return composer, fmt.Errorf("seek rain info : %w", err)
 	}
-	charts, err := GenerateCharts(rain)
+	charts, err := GenerateCharts(rain, pos.Trim.GetWidth())
 	if err != nil {
 		return composer, fmt.Errorf("generate charts : %w", err)
 	}

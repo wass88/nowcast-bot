@@ -9,6 +9,13 @@ var positionConfig PositionConfig = PositionConfig{
 	Y:            323,
 	CursorHeight: 10,
 	MapID:        10,
+	Trim: TrimConfig{
+		Trim:   true,
+		X:      100,
+		Y:      60,
+		Width:  600,
+		Height: 600,
+	},
 }
 
 func TestDownloadImage(t *testing.T) {

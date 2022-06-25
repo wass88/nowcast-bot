@@ -14,7 +14,7 @@ func TestGenerateChart(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	charts, err := GenerateCharts(rain)
+	charts, err := GenerateCharts(rain, positionConfig.Trim.GetWidth())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func TestAnnotate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	charts, err := GenerateCharts(rain)
+	charts, err := GenerateCharts(rain, positionConfig.Trim.GetWidth())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func TestImagesAnnotate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	charts, err := GenerateCharts(rain)
+	charts, err := GenerateCharts(rain, positionConfig.Trim.GetWidth())
 	if err != nil {
 		t.Fatal(err)
 	}

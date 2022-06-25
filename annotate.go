@@ -30,8 +30,8 @@ func DrawFont(img *image.RGBA, text string, x, y float64) {
 	d.DrawString(text)
 }
 
-func GenerateCharts(r RainInfo) ([]image.Image, error) {
-	width := 400.
+func GenerateCharts(r RainInfo, widthInt int) ([]image.Image, error) {
+	width := (float64)(widthInt)
 	height := 50.
 	boxTop := 14.
 	boxLeft := 10.
@@ -97,7 +97,7 @@ func GenerateCharts(r RainInfo) ([]image.Image, error) {
 		gc := draw2dimg.NewGraphicContext(c)
 		lineX := timeX(r.Rains[i].Time)
 		gc.SetFillColor(color.RGBA{0xff, 0x66, 0x22, 0xff})
-		draw2dkit.Rectangle(gc, lineX-1, boxTop-2, lineX+1, boxTop+boxHeight+2)
+		draw2dkit.Rectangle(gc, lineX-2, boxTop-2, lineX+2, boxTop+boxHeight+2)
 		gc.Fill()
 		charts = append(charts, c)
 		gc.Close()
@@ -106,12 +106,12 @@ func GenerateCharts(r RainInfo) ([]image.Image, error) {
 	return charts, nil
 }
 
-func (img NowcastImage) AddCursor(pos PositionConfig) (NowcastImage, error) {
+func (img NowcastImage) AddCursor(pos PositionConfig, trim TrimConfig) (NowcastImage, error) {
 	res := img.Image.(*image.RGBA)
 	gc := draw2dimg.NewGraphicContext(res)
 	gc.SetFillColor(color.RGBA{0xff, 0x66, 0x22, 0xff})
-	x := float64(pos.X)
-	y := float64(pos.Y)
+	x := float64(pos.X - trim.GetX())
+	y := float64(pos.Y - trim.GetY())
 	h := float64(pos.CursorHeight)
 	draw2dkit.Rectangle(gc, x, y+1, x+1, y+h)
 	gc.Fill()
@@ -121,26 +121,30 @@ func (img NowcastImage) AddCursor(pos PositionConfig) (NowcastImage, error) {
 	return img, nil
 }
 
-func (img NowcastImage) AddChart(chart image.Image) (NowcastImage, error) {
-	res := image.NewRGBA(image.Rect(0, 0, nowcastWidth, nowcastHeight))
-	draw.Copy(res, image.Point{}, img.Image, img.Image.Bounds(), draw.Over, &draw.Options{})
-	draw.Copy(res, image.Point{}, chart, chart.Bounds(), draw.Over, &draw.Options{})
+func (img NowcastImage) AddChart(chart image.Image, trim TrimConfig) (NowcastImage, error) {
+	res := image.NewRGBA(trim.GetSize())
+	draw.Copy(res, image.Point{}, img.Image, trim.GetSize(), draw.Over, &draw.Options{})
+	draw.Copy(res, image.Point{}, chart, trim.GetSize(), draw.Over, &draw.Options{})
 	img.Image = res
 	return img, nil
 }
 
-func (img NowcastImage) AddOnMap(mapImage image.Image) (NowcastImage, error) {
-	res := image.NewRGBA(image.Rect(0, 0, nowcastWidth, nowcastHeight))
-	for x := 0; x < nowcastWidth; x++ {
-		for y := 0; y < nowcastHeight; y++ {
+func (img NowcastImage) AddOnMap(mapImage image.Image, trim TrimConfig) (NowcastImage, error) {
+	dx := trim.GetX()
+	dy := trim.GetY()
+	width := trim.GetWidth()
+	height := trim.GetHeight()
+	res := image.NewRGBA(trim.GetSize())
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
 			res.Set(x, y, color.Gray{0x30})
 		}
 	}
-	draw.Copy(res, image.Point{}, mapImage, mapImage.Bounds(), draw.Over, &draw.Options{})
+	draw.Copy(res, image.Point{}, mapImage, trim.GetBound(), draw.Over, &draw.Options{})
 	transparented := img.Image
-	for x := 0; x < nowcastWidth; x++ {
-		for y := 0; y < nowcastHeight; y++ {
-			r, g, b, a := transparented.At(x, y).RGBA()
+	for x := 0; x < width; x++ {
+		for y := 0; y < height; y++ {
+			r, g, b, a := transparented.At(x+dx, y+dy).RGBA()
 			if a > 0 {
 				R, G, B, _ := res.At(x, y).RGBA()
 				alphaF := uint32(3)
@@ -158,15 +162,15 @@ func (img NowcastImage) AddOnMap(mapImage image.Image) (NowcastImage, error) {
 }
 
 func (img NowcastImage) Annotate(pos PositionConfig, chart image.Image, mapImg image.Image) (NowcastImage, error) {
-	img, err := img.AddOnMap(mapImg)
+	img, err := img.AddOnMap(mapImg, pos.Trim)
 	if err != nil {
 		return img, fmt.Errorf("add chart : %w", err)
 	}
-	img, err = img.AddCursor(pos)
+	img, err = img.AddCursor(pos, pos.Trim)
 	if err != nil {
 		return img, fmt.Errorf("add cursor : %w", err)
 	}
-	img, err = img.AddChart(chart)
+	img, err = img.AddChart(chart, pos.Trim)
 	if err != nil {
 		return img, fmt.Errorf("add chart : %w", err)
 	}
@@ -182,4 +186,43 @@ func (imgs NowcastImages) Annotate(pos PositionConfig, charts []image.Image) (No
 		imgs.Nowcast[i] = img
 	}
 	return imgs, nil
+}
+
+func (t *TrimConfig) SetDefault() {
+	if !t.Trim {
+		t.X = 0
+		t.Y = 0
+		t.Width = nowcastWidth
+		t.Height = nowcastHeight
+	}
+}
+
+func (t TrimConfig) GetX() int {
+	t.SetDefault()
+	return t.X
+}
+
+func (t TrimConfig) GetY() int {
+	t.SetDefault()
+	return t.Y
+}
+
+func (t TrimConfig) GetWidth() int {
+	t.SetDefault()
+	return t.Width
+}
+
+func (t TrimConfig) GetHeight() int {
+	t.SetDefault()
+	return t.Height
+}
+
+func (t TrimConfig) GetBound() image.Rectangle {
+	t.SetDefault()
+	return image.Rect(t.X, t.Y, t.X+t.Width, t.Y+t.Height)
+}
+
+func (t TrimConfig) GetSize() image.Rectangle {
+	t.SetDefault()
+	return image.Rect(0, 0, t.Width, t.Height)
 }
