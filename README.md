@@ -8,3 +8,5 @@ POS_Y=323 \
 MAP_ID=10 \
 ./nowcast-bot
 ```
+
+![image](https://user-images.githubusercontent.com/26019458/175773761-25b80f0b-beba-4617-9177-48b2c5a4f811.png)
