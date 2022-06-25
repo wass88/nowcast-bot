@@ -1,4 +1,4 @@
-name: Scheduled build
+name: Cron Nowcat Bot
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: build
+    name: Run bot
     runs-on: ubuntu-latest
     steps:
       - uses: robinraju/release-downloader@v1.4

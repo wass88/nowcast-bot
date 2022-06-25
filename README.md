@@ -1,5 +1,7 @@
 # NowCast Bot
 
+[![cron](https://github.com/wass88/nowcast-bot/actions/workflows/cron.yml/badge.svg)](https://github.com/wass88/nowcast-bot/actions/workflows/cron.yml)
+
 ```
 SLACK_WEBHOOK=https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
 GYAZO_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \
