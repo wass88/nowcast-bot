@@ -3,6 +3,9 @@ name: Cron Nowcat Bot
 on:
   schedule:
     - cron: '0,20,40 * * * *'
+  push:
+    branches:
+      - master
 
 jobs:
   build:
