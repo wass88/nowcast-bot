@@ -15,7 +15,7 @@ jobs:
       - uses: robinraju/release-downloader@v1.4
         with:
           latest: true
-          fileName: "*_amd64.tar.gz"
+          fileName: "*_linux_amd64.tar.gz"
       - name: unarchive
         run: tar -zxvf ./*.tar.gz ./nowcast-bot
       - name: run
