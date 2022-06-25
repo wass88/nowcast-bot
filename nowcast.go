@@ -1,77 +1,47 @@
 package main
 
-import (
-	"fmt"
-	"image"
-	"time"
-)
+import "fmt"
 
 type PositionConfig struct {
-	Latitude  float64
-	Longitude float64
-	MapID     int
+	X            int
+	Y            int
+	CursorHeight int
+	MapID        int
 }
 
 type NowcastComposer struct {
-	Pos PositionConfig
+	Pos       PositionConfig
+	Images    NowcastImages
+	Annotated NowcastImages
+	Rain      RainInfo
 }
 
-func NewNowcastComposer(pos PositionConfig) NowcastComposer {
-	return NowcastComposer{Pos: pos}
-}
-
-type NowcastImage struct {
-	Image image.Image
-	Date  time.Time
-	Url   string
-}
-
-type NowcastImages []NowcastImage
-
-func CreateGIF(pos PositionConfig) (image.Image, error) {
-	composer := NewNowcastComposer(pos)
-	return composer.downloadGIF()
-}
-
-func (c *NowcastComposer) downloadGIF() (image.Image, error) {
-	now := time.Now()
-	needDownload, err := DownloadableImage(now)
+func NewComposer(pos PositionConfig) (NowcastComposer, error) {
+	var composer NowcastComposer
+	images, err := DownloadableImage(pos.MapID)
 	if err != nil {
-		return nil, fmt.Errorf("downloadable images : %w", err)
+		return composer, fmt.Errorf("downloadable image : %w", err)
 	}
-	images, err := needDownload.Download()
+	err = images.Fetch()
 	if err != nil {
-		return nil, fmt.Errorf("download images : %w", err)
+		return composer, fmt.Errorf("fetch : %w", err)
 	}
-	return images.composeGIF()
-}
-
-func (images NowcastImages) composeGIF() (image.Image, error) {
-	//TODO
-	return nil, nil
-}
-
-func (d NowcastImages) Download() (NowcastImages, error) {
-	//TODO
-	return NowcastImages{}, nil
-}
-
-func DownloadableImage(now time.Time, mapID int) (NowcastImages, error) {
-	//TODO
-	date := now.Format("20060102150400")
-	nearMax := 12
-	for i := 0; i < nearMax; i++ {
-		fmt.Sprintf("https://www.jma.go.jp/bosai/rain/data/ra/20220620115000/rain01_%s_f%02d_a%02d.png", date, i, mapID)
+	rain, err := images.SeekRainInfo(pos)
+	if err != nil {
+		return composer, fmt.Errorf("seek rain info : %w", err)
 	}
-	return NowcastImages{}, nil
+	charts, err := GenerateCharts(rain)
+	if err != nil {
+		return composer, fmt.Errorf("generate charts : %w", err)
+	}
+	annotated, err := images.Annotate(pos, charts)
+	if err != nil {
+		return composer, fmt.Errorf("annotate : %w", err)
+	}
+
+	return NowcastComposer{Pos: pos, Images: images, Annotated: annotated, Rain: rain}, nil
 }
 
-func DownloadImage(url string) (image.Image, error) {
-	//TOOD
-	return nil, nil
-}
-
-func MergeImage(img, on string) (image.Image, error) {
-	//TODO
-	return nil, nil
+func (c *NowcastComposer) Rainy() bool {
+	return c.Rain.Rainy()
 }

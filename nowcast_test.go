@@ -1,28 +1,28 @@
 package main
 
 import (
+	"fmt"
+	"image/gif"
+	"os"
 	"testing"
-	"time"
 )
 
-func TestDownloadableImage(t *testing.T) {
-	date, err := time.Parse(time.RFC3339, "2019-01-01T00:00:00Z")
+func TestGeneateGif(t *testing.T) {
+	composer, err := NewComposer(positionConfig)
 	if err != nil {
 		t.Fatal(err)
 	}
-	images, err := DownloadableImage(date)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("%v", images)
-}
 
-func GenGif(t *testing.T) {
-	PositionConfig := PositionConfig{
-		Latitude:  35.6812,
-		Longitude: 139.767125,
-		MapID:     1,
+	rainGif := composer.ComposeGif()
+
+	filename := fmt.Sprintf("%s/rain.gif", TestDir)
+	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		t.Fatal(err)
 	}
-	composer := NewNowcastComposer(PositionConfig)
-	composer.downloadGIF()
+	defer f.Close()
+	gif.EncodeAll(f, &rainGif)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
