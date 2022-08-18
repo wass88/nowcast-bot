@@ -16,6 +16,7 @@ type RainData struct {
 	ImageID   int
 	RainFall  int
 	RainColor color.Color
+	RainRange float64
 }
 
 var RainFallColor = map[string]int{
@@ -32,10 +33,18 @@ var RainFallColor = map[string]int{
 func (n NowcastImage) SeekRainData(pos PositionConfig) (RainData, error) {
 	rainFall := 0
 	var rainColor color.Color
-	for dy := 0; dy < pos.CursorHeight; dy++ {
-		c := n.Image.At(pos.X, pos.Y+dy)
+	fallRange := 0.
+	for i := 0; i < 2*pos.CursorHeight; i++ {
+		dy := i - pos.CursorHeight
+		dx := 0
+		if i < pos.CursorHeight {
+			dy = 0
+			dx = i
+		}
+		c := n.Image.At(pos.X+dx, pos.Y+dy)
 		r, g, b, a := c.RGBA()
 		if a > 0 {
+			fallRange += 1
 			colorCode := fmt.Sprintf("#%02x%02x%02x", r>>8, g>>8, b>>8)
 			fall, ok := RainFallColor[colorCode]
 			if !ok {
@@ -47,7 +56,7 @@ func (n NowcastImage) SeekRainData(pos PositionConfig) (RainData, error) {
 			}
 		}
 	}
-	return RainData{Time: n.Time, RainFall: rainFall, RainColor: rainColor}, nil
+	return RainData{Time: n.Time, RainFall: rainFall, RainColor: rainColor, RainRange: fallRange / float64(2*pos.CursorHeight)}, nil
 }
 
 func (n NowcastImages) SeekRainInfo(pos PositionConfig) (RainInfo, error) {

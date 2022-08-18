@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"math"
 	"time"
 
 	"github.com/llgcode/draw2d/draw2dimg"
@@ -64,7 +65,9 @@ func GenerateCharts(r RainInfo, widthInt int) ([]image.Image, error) {
 		}
 		nextTime := r.Rains[i+1].Time
 		gc.SetFillColor(rain.RainColor)
-		draw2dkit.Rectangle(gc, timeX(rain.Time), boxTop, timeX(nextTime), boxTop+boxHeight)
+		rangeHeight := math.Sqrt(rain.RainRange) * boxHeight
+		rangeMargin := (boxHeight - rangeHeight) / 2
+		draw2dkit.Rectangle(gc, timeX(rain.Time), boxTop+rangeMargin, timeX(nextTime), boxTop+boxHeight-rangeMargin)
 		gc.Fill()
 	}
 
