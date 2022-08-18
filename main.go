@@ -24,7 +24,7 @@ func main() {
 	pos := PositionConfig{
 		X:            env.PosX,
 		Y:            env.PosY,
-		CursorHeight: 10,
+		CursorHeight: 30,
 		MapID:        env.MapID,
 	}
 	if env.Trim != "" {

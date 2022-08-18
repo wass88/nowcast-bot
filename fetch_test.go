@@ -7,7 +7,7 @@ var TestDir string = "./forTest/"
 var positionConfig PositionConfig = PositionConfig{
 	X:            490,
 	Y:            323,
-	CursorHeight: 20,
+	CursorHeight: 30,
 	MapID:        10,
 	Trim: TrimConfig{
 		Trim:   true,
