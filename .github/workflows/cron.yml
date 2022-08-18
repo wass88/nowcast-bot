@@ -26,4 +26,4 @@ jobs:
           POS_X: ${{secrets.POS_X}}
           POS_Y: ${{secrets.POS_Y}}
           MAP_ID: ${{secrets.MAP_ID}}
-          # TRIM: ${{secrets.TRIM}}
+          TRIM: ${{secrets.TRIM}}
