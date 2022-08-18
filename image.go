@@ -35,11 +35,11 @@ func (n NowcastImage) SeekRainData(pos PositionConfig) (RainData, error) {
 	var rainColor color.Color
 	fallRange := 0.
 	for i := 0; i < 2*pos.CursorHeight; i++ {
-		dy := i - pos.CursorHeight
+		dy := i - pos.CursorHeight - pos.CursorHeight/2
 		dx := 0
 		if i < pos.CursorHeight {
 			dy = 0
-			dx = i
+			dx = i - pos.CursorHeight/2
 		}
 		c := n.Image.At(pos.X+dx, pos.Y+dy)
 		r, g, b, a := c.RGBA()

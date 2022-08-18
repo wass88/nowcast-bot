@@ -116,9 +116,9 @@ func (img NowcastImage) AddCursor(pos PositionConfig, trim TrimConfig) (NowcastI
 	x := float64(pos.X - trim.GetX())
 	y := float64(pos.Y - trim.GetY())
 	h := float64(pos.CursorHeight)
-	draw2dkit.Rectangle(gc, x, y+1, x+1, y+h)
+	draw2dkit.Rectangle(gc, x, y-h/2, x+1, y+h/2)
 	gc.Fill()
-	draw2dkit.Rectangle(gc, x-h/2+1, y+h/2, x+h/2, y+h/2+1)
+	draw2dkit.Rectangle(gc, x-h/2, y, x+h/2, y+1)
 	gc.Fill()
 	img.Image = res
 	return img, nil
