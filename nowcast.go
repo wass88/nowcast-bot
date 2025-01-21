@@ -50,6 +50,6 @@ func NewComposer(pos PositionConfig) (NowcastComposer, error) {
 	return NowcastComposer{Pos: pos, Images: images, Annotated: annotated, Rain: rain}, nil
 }
 
-func (c *NowcastComposer) Rainy() bool {
-	return c.Rain.Rainy()
+func (c *NowcastComposer) Rainy(threshold int) bool {
+	return c.Rain.RainTotal() >= threshold
 }

@@ -72,11 +72,10 @@ func (n NowcastImages) SeekRainInfo(pos PositionConfig) (RainInfo, error) {
 	return res, nil
 }
 
-func (r RainInfo) Rainy() bool {
+func (r RainInfo) RainTotal() int {
+	total := 0
 	for i := range r.Rains {
-		if r.Rains[i].RainFall > 0 {
-			return true
-		}
+		total += r.Rains[i].RainFall
 	}
-	return false
+	return total
 }

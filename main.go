@@ -10,12 +10,13 @@ import (
 )
 
 type Env struct {
-	MapID        int    `envconfig:"MAP_ID" required:"true"`
-	PosX         int    `envconfig:"POS_X" required:"true"`
-	PosY         int    `envconfig:"POS_Y" required:"true"`
-	SlackWebhook string `envconfig:"SLACK_WEBHOOK" required:"true"`
-	GyazoToken   string `envconfig:"GYAZO_TOKEN" required:"true"`
-	Trim         string `envconfig:"TRIM"`
+	MapID         int    `envconfig:"MAP_ID" required:"true"`
+	PosX          int    `envconfig:"POS_X" required:"true"`
+	PosY          int    `envconfig:"POS_Y" required:"true"`
+	SlackWebhook  string `envconfig:"SLACK_WEBHOOK" required:"true"`
+	GyazoToken    string `envconfig:"GYAZO_TOKEN" required:"true"`
+	Trim          string `envconfig:"TRIM"`
+	RainThreshold int    `envconfig:"RAIN_THRESHOLD" default:"0"`
 }
 
 func main() {
@@ -46,7 +47,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if !composer.Rainy() {
+	if !composer.Rainy(env.RainThreshold) {
 		fmt.Println("not rainy")
 		return
 	}
